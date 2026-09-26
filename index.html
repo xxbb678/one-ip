@@ -15,6 +15,31 @@
   <meta name="description" content="IP 查询、网站分流、WebRTC 检测、全球 Ping、服务状态和 WHOIS 查询工具。" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script>
+    // Surface uncaught JS errors (including module parse errors) so the
+    // failure is visible on the page instead of a silent blank screen.
+    (function () {
+      function show(msg) {
+        try {
+          var el = document.createElement("div");
+          el.setAttribute("data-one-ip-error", "1");
+          el.style.cssText =
+            "position:fixed;top:0;left:0;right:0;z-index:2147483647;" +
+            "background:#fee;color:#900;font:12px/1.5 monospace;padding:10px;" +
+            "white-space:pre-wrap;word-break:break-all;border-bottom:2px solid #900";
+          el.textContent = "JS错误: " + msg;
+          (document.body || document.documentElement).appendChild(el);
+        } catch (e) {}
+      }
+      window.addEventListener("error", function (e) {
+        show((e.message || String(e.error || "unknown")) +
+          (e.filename ? " @ " + e.filename.split("/").pop() + ":" + e.lineno : ""));
+      });
+      window.addEventListener("unhandledrejection", function (e) {
+        show("Promise: " + (e.reason && (e.reason.stack || e.reason.message) || e.reason));
+      });
+    })();
+  </script>
+  <script>
     // ES2023 / iOS16 array helpers are missing on iOS 15 and older Safari.
     // Without these the app bundle throws on first call and renders a blank
     // page, so define the methods on the Array prototype before it runs.
