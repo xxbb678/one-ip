@@ -15,6 +15,52 @@
   <meta name="description" content="IP 查询、网站分流、WebRTC 检测、全球 Ping、服务状态和 WHOIS 查询工具。" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <script>
+    // ES2023 / iOS16 array helpers are missing on iOS 15 and older Safari.
+    // Without these the app bundle throws on first call and renders a blank
+    // page, so define the methods on the Array prototype before it runs.
+    (function () {
+      var p = Array.prototype;
+      if (typeof p.toSorted !== "function") {
+        p.toSorted = function (compare) {
+          return this.slice().sort(compare);
+        };
+      }
+      if (typeof p.toReversed !== "function") {
+        p.toReversed = function () {
+          return this.slice().reverse();
+        };
+      }
+      if (typeof p.toSpliced !== "function") {
+        p.toSpliced = function (start, skip) {
+          var copy = this.slice();
+          if (arguments.length === 0) return copy;
+          var remove = skip === undefined ? 0 : skip;
+          var items = Array.prototype.slice.call(arguments, 2);
+          var args = [start, remove].concat(items);
+          copy.splice.apply(copy, args);
+          return copy;
+        };
+      }
+      if (typeof p.with !== "function") {
+        p.with = function (index, value) {
+          var copy = this.slice();
+          copy[index] = value;
+          return copy;
+        };
+      }
+      if (typeof Object.hasOwn !== "function") {
+        Object.hasOwn = function (target, key) {
+          return Object.prototype.hasOwnProperty.call(target, key);
+        };
+      }
+      if (typeof globalThis.structuredClone !== "function") {
+        globalThis.structuredClone = function (value) {
+          return JSON.parse(JSON.stringify(value));
+        };
+      }
+    })();
+  </script>
+  <script>
     // Classic ES5 script: IE cannot execute the application's module bundle.
     (function () {
       var root = document.documentElement;
