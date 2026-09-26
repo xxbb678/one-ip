@@ -77,5 +77,10 @@ export default defineConfig(() => {
       },
     },
     preview: { headers },
+    // Lower the CSS target so LightningCSS downgrades modern-only features
+    // (container queries, native nesting) for Safari 15 / iOS 15.8.
+    build: {
+      cssTarget: ["safari15", "chrome100", "firefox100"],
+    },
   };
 });
